@@ -51,7 +51,7 @@ Implemented and tested on Ubuntu 16.04 with Python 3.5 and Tensorflow 1.3.0.
 
 1. Clone this repo
 ```bash
-git clone git@github.com:kujason/avod.git --recurse-submodules
+git clone git@github.com:BoomFan/avod.git --recurse-submodules
 ```
 If you forget to clone the wavedata submodule:
 ```bash
