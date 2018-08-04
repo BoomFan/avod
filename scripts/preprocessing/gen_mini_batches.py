@@ -2,6 +2,14 @@ import os
 
 import numpy as np
 
+# Add this block for ROS python conflict
+import sys
+try:
+    sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
+    sys.path.remove('/home/boom/segway_kinetic_ws/devel/lib/python2.7/dist-packages')
+except ValueError:
+    pass
+
 import avod
 from avod.builders.dataset_builder import DatasetBuilder
 
@@ -100,10 +108,10 @@ def main(dataset=None):
     # Serial vs parallel processing
     in_parallel = True
 
-    process_car = True   # Cars
-    process_ped = False  # Pedestrians
-    process_cyc = False  # Cyclists
-    process_ppl = True   # People (Pedestrians + Cyclists)
+    process_car = False   # Cars , default: True
+    process_ped = True  # Pedestrians , default: False
+    process_cyc = False  # Cyclists , default: False
+    process_ppl = False   # People (Pedestrians + Cyclists) , default: True
 
     # Number of child processes to fork, samples will
     #  be divided evenly amongst the processes (in_parallel must be True)

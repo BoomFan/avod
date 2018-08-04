@@ -102,16 +102,16 @@ To train on the [Kitti Object Detection Dataset](http://www.cvlibs.net/datasets/
 The folder should look something like the following:
 ```
 Kitti
-    object
-        testing
-        training
-            calib
-            image_2
-            label_2
-            planes
-            velodyne
-        train.txt
-        val.txt
+└── object
+    ├── testing
+    ├── training
+    │   ├── calib
+    │   ├── image_2
+    │   ├── label_2
+    │   ├── planes
+    │   └── velodyne
+    ├── train.txt
+    └── val.txt
 ```
 
 ### Mini-batch Generation
@@ -121,7 +121,7 @@ Note: This script does parallel processing with `num_[class]_children` processes
 
 ```bash
 cd avod
-python scripts/preprocessing/gen_mini_batches.py
+python3 scripts/preprocessing/gen_mini_batches.py
 ```
 
 Once this script is done, you should now have the following folders inside `avod/data`:
