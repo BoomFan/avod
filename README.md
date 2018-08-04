@@ -137,11 +137,11 @@ There are sample configuration files for training inside `avod/configs`. You can
 ### Run Trainer
 To start training, run the following:
 ```bash
-python avod/experiments/run_training.py --pipeline_config=avod/configs/avod_cars_example.config
+python3 avod/experiments/run_training.py --pipeline_config=avod/configs/avod_cars_example.config
 ```
 (Optional) Training defaults to using GPU device 1, and the `train` split. You can specify using the GPU device and data split as follows:
 ```bash
-python avod/experiments/run_training.py --pipeline_config=avod/configs/avod_cars_example.config  --device='0' --data_split='train'
+python3 avod/experiments/run_training.py --pipeline_config=avod/configs/avod_cars_example.config  --device='0' --data_split='train'
 ```
 Depending on your setup, training should take approximately 16 hours with a Titan Xp, and 20 hours with a GTX 1080. If the process was interrupted, training (or evaluation) will continue from the last saved checkpoint if it exists.
 
