@@ -58,7 +58,7 @@ If you forget to clone the wavedata submodule:
 git submodule update --init --recursive
 ```
 
-2. Install Python dependencies
+2. Install Python dependencies (also tested with tensorflow-gpu 1.8.0)
 ```bash
 cd avod
 pip3 install -r requirements.txt
@@ -127,8 +127,8 @@ python3 scripts/preprocessing/gen_mini_batches.py
 Once this script is done, you should now have the following folders inside `avod/data`:
 ```
 data
-    label_clusters
-    mini_batches
+├── label_clusters
+└── mini_batches
 ```
 
 ### Training Configuration
