@@ -148,11 +148,11 @@ Depending on your setup, training should take approximately 16 hours with a Tita
 ### Run Evaluator
 To start evaluation, run the following:
 ```bash
-python avod/experiments/run_evaluation.py --pipeline_config=avod/configs/avod_cars_example.config
+python3 avod/experiments/run_evaluation.py --pipeline_config=avod/configs/avod_cars_example.config
 ```
 (Optional) With additional options:
 ```bash
-python avod/experiments/run_evaluation.py --pipeline_config=avod/configs/avod_cars_example.config --device='0' --data_split='val'
+python3 avod/experiments/run_evaluation.py --pipeline_config=avod/configs/avod_cars_example.config --device='0' --data_split='val'
 ```
 
 The evaluator has two main modes, you can either evaluate a single checkpoint, a list of indices of checkpoints, or repeatedly. The evaluator is designed to be run in parallel with the trainer on the same GPU, to repeatedly evaluate checkpoints. This can be configured inside the same config file (look for `eval_config` entry).
