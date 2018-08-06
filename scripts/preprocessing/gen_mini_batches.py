@@ -90,6 +90,7 @@ def main(dataset=None):
     """
 
     if dataset is not None:
+        print('Dataset is provided, now process ', dataset)
         do_preprocessing(dataset, None)
         return
 
