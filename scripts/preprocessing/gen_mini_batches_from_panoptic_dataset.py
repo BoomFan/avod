@@ -11,18 +11,18 @@ except ValueError:
     pass
 
 import avod
-from avod.builders.dataset_builder import DatasetBuilder
+from avod.builders.panoptic_dataset_builder import DatasetBuilder
 
 
 def do_preprocessing(dataset, indices):
 
-    mini_batch_utils = dataset.kitti_utils.mini_batch_utils
+    mini_batch_panoptic_utils = dataset.panoptic_utils.mini_batch_panoptic_utils
 
     print("Generating mini batches in {}".format(
-        mini_batch_utils.mini_batch_dir))
+        mini_batch_panoptic_utils.mini_batch_dir))
 
     # Generate all mini-batches, this can take a long time
-    mini_batch_utils.preprocess_rpn_mini_batches(indices)
+    mini_batch_panoptic_utils.preprocess_rpn_mini_batches(indices)
 
     print("Mini batches generated")
 
@@ -77,31 +77,14 @@ def split_work(all_child_pids, dataset, indices_split, num_children):
             os._exit(0)
 
 
-def main(dataset=None):
+def main():
     """Generates anchors info which is used for mini batch sampling.
+        This code only generate mini batches for the CMU Panoptic dataset.
 
-    Processing on 'Cars' can be split into multiple processes, see the Options
-    section for configuration.
-
-    Args:
-        dataset: KittiDataset (optional)
-            If dataset is provided, only generate info for that dataset.
-            If no dataset provided, generates info for all 3 classes.
     """
 
-    if dataset is not None:
-        print('Dataset is provided, now process ', dataset)
-        do_preprocessing(dataset, None)
-        return
-
-    car_dataset_config_path = avod.root_dir() + \
-        '/configs/mb_preprocessing/rpn_cars.config'
-    ped_dataset_config_path = avod.root_dir() + \
-        '/configs/mb_preprocessing/rpn_pedestrians.config'
-    cyc_dataset_config_path = avod.root_dir() + \
-        '/configs/mb_preprocessing/rpn_cyclists.config'
-    ppl_dataset_config_path = avod.root_dir() + \
-        '/configs/mb_preprocessing/rpn_people.config'
+    panoptic_dataset_config_path = avod.root_dir() + \
+        '/configs/mb_preprocessing/rpn_panoptic.config'
 
     ##############################
     # Options
@@ -109,46 +92,26 @@ def main(dataset=None):
     # Serial vs parallel processing
     in_parallel = True
 
-    process_car = False   # Cars , default: True
     process_ped = True  # Pedestrians , default: False
-    process_cyc = False  # Cyclists , default: False
-    process_ppl = False   # People (Pedestrians + Cyclists) , default: True
 
     # Number of child processes to fork, samples will
     #  be divided evenly amongst the processes (in_parallel must be True)
-    num_car_children = 8
     num_ped_children = 8
-    num_cyc_children = 8
-    num_ppl_children = 8
 
     ##############################
     # Dataset setup
     ##############################
-    if process_car:
-        car_dataset = DatasetBuilder.load_dataset_from_config(
-            car_dataset_config_path)
+
     if process_ped:
         ped_dataset = DatasetBuilder.load_dataset_from_config(
-            ped_dataset_config_path)
-    if process_cyc:
-        cyc_dataset = DatasetBuilder.load_dataset_from_config(
-            cyc_dataset_config_path)
-    if process_ppl:
-        ppl_dataset = DatasetBuilder.load_dataset_from_config(
-            ppl_dataset_config_path)
+            panoptic_dataset_config_path)
 
     ##############################
     # Serial Processing
     ##############################
     if not in_parallel:
-        if process_car:
-            do_preprocessing(car_dataset, None)
         if process_ped:
             do_preprocessing(ped_dataset, None)
-        if process_cyc:
-            do_preprocessing(cyc_dataset, None)
-        if process_ppl:
-            do_preprocessing(ppl_dataset, None)
 
         print('All Done (Serial)')
 
@@ -160,15 +123,6 @@ def main(dataset=None):
         # List of all child pids to wait on
         all_child_pids = []
 
-        # Cars
-        if process_car:
-            car_indices_split = split_indices(car_dataset, num_car_children)
-            split_work(
-                all_child_pids,
-                car_dataset,
-                car_indices_split,
-                num_car_children)
-
         # Pedestrians
         if process_ped:
             ped_indices_split = split_indices(ped_dataset, num_ped_children)
@@ -177,24 +131,6 @@ def main(dataset=None):
                 ped_dataset,
                 ped_indices_split,
                 num_ped_children)
-
-        # Cyclists
-        if process_cyc:
-            cyc_indices_split = split_indices(cyc_dataset, num_cyc_children)
-            split_work(
-                all_child_pids,
-                cyc_dataset,
-                cyc_indices_split,
-                num_cyc_children)
-
-        # People (Pedestrians + Cyclists)
-        if process_ppl:
-            ppl_indices_split = split_indices(ppl_dataset, num_ppl_children)
-            split_work(
-                all_child_pids,
-                ppl_dataset,
-                ppl_indices_split,
-                num_ppl_children)
 
         # Wait to child processes to finish
         print('num children:', len(all_child_pids))

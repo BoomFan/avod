@@ -187,7 +187,10 @@ class LabelClusterUtils:
                 sample_idx + 1, num_samples))
             sys.stdout.flush()
 
+            print('sample_list = ', sample_list)
+            print('sample_idx = ', sample_idx)
             sample_name = sample_list[sample_idx]
+            print('sample_name = ', sample_name)
             img_idx = int(sample_name)
 
             obj_labels = obj_utils.read_labels(self._dataset.label_dir,

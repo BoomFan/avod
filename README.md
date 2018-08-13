@@ -104,12 +104,31 @@ The folder should look something like the following:
 Kitti
 └── object
     ├── testing
+    │   ├── calib
+    │   │   ├── xxxxxx.txt
+    │   │   └── xxxxxx.txt
+    │   ├── image_2
+    │   │   ├── xxxxxx.png
+    │   │   └── xxxxxx.png
+    │   └── velodyne
+    │       ├── xxxxxx.bin
+    │       └── xxxxxx.bin
     ├── training
     │   ├── calib
+    │   │   ├── xxxxxx.txt
+    │   │   └── xxxxxx.txt
     │   ├── image_2
+    │   │   ├── xxxxxx.png
+    │   │   └── xxxxxx.png
     │   ├── label_2
+    │   │   ├── xxxxxx.txt
+    │   │   └── xxxxxx.txt
     │   ├── planes
+    │   │   ├── xxxxxx.txt
+    │   │   └── xxxxxx.txt
     │   └── velodyne
+    │       ├── xxxxxx.bin
+    │       └── xxxxxx.bin
     ├── train.txt
     └── val.txt
 ```
