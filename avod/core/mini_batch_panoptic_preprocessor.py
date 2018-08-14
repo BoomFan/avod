@@ -4,10 +4,10 @@ import os
 
 from PIL import Image
 
-from wavedata.tools.obj_detection import obj_utils
+from wavedata.tools.obj_detection import obj_panoptic_utils
 from wavedata.tools.obj_detection import evaluation
 
-from avod.core import box_3d_encoder, anchor_projector
+from avod.core import box_3d_panoptic_encoder, anchor_projector
 from avod.core import anchor_encoder
 from avod.core import anchor_filter
 
@@ -78,13 +78,15 @@ class MiniBatchPreprocessor(object):
         anchor_boxes_3d = all_anchor_boxes_3d[empty_anchor_filter]
 
         # Convert anchor_boxes_3d to anchor format
-        anchors = box_3d_encoder.box_3d_to_anchor(anchor_boxes_3d)
+        anchors = box_3d_panoptic_encoder.box_3d_to_anchor(anchor_boxes_3d)
 
         # Convert gt to boxes_3d -> anchors -> iou format
+        print('mini_batch_panoptic_preprocessor.py :')
+        print('gt_labels = ', gt_labels)
         gt_boxes_3d = np.asarray(
-            [box_3d_encoder.object_label_to_box_3d(gt_obj)
+            [box_3d_panoptic_encoder.object_label_to_box_3d(gt_obj)
              for gt_obj in gt_labels])
-        gt_anchors = box_3d_encoder.box_3d_to_anchor(gt_boxes_3d,
+        gt_anchors = box_3d_panoptic_encoder.box_3d_to_anchor(gt_boxes_3d,
                                                      ortho_rotate=True)
 
         rpn_iou_type = self.mini_batch_panoptic_utils.rpn_iou_type
@@ -98,11 +100,11 @@ class MiniBatchPreprocessor(object):
 
         elif rpn_iou_type == '3d':
             # Convert anchors to 3d iou format for calculation
-            anchors_for_3d_iou = box_3d_encoder.box_3d_to_3d_iou_format(
+            anchors_for_3d_iou = box_3d_panoptic_encoder.box_3d_to_3d_iou_format(
                 anchor_boxes_3d)
 
             gt_boxes_for_3d_iou = \
-                box_3d_encoder.box_3d_to_3d_iou_format(gt_boxes_3d)
+                box_3d_panoptic_encoder.box_3d_to_3d_iou_format(gt_boxes_3d)
         else:
             raise ValueError('Invalid rpn_iou_type {}', rpn_iou_type)
 
@@ -139,7 +141,7 @@ class MiniBatchPreprocessor(object):
 
             # Calculate offsets, use 3D iou to get highest iou
             anchors_to_update = anchors[update_indices]
-            gt_anchor = box_3d_encoder.box_3d_to_anchor(gt_box_3d,
+            gt_anchor = box_3d_panoptic_encoder.box_3d_to_anchor(gt_box_3d,
                                                         ortho_rotate=True)
             offsets = anchor_encoder.anchor_to_offset(anchors_to_update,
                                                       gt_anchor)
@@ -206,10 +208,12 @@ class MiniBatchPreprocessor(object):
                 continue
 
             # Get ground truth and filter based on difficulty
-            ground_truth_list = obj_utils.read_labels(dataset.label_dir,
+            ground_truth_list = obj_panoptic_utils.read_labels(dataset.label_dir,
                                                       img_idx)
 
             # Filter objects to dataset classes
+            print('mini_batch_panoptic_preprocessor.py : ')
+            print('ground_truth_list = ', ground_truth_list)
             filtered_gt_list = dataset_utils.filter_labels(ground_truth_list)
             filtered_gt_list = np.asarray(filtered_gt_list)
 
@@ -225,7 +229,7 @@ class MiniBatchPreprocessor(object):
                 continue
 
             # Get ground plane
-            ground_plane = obj_utils.get_road_plane(img_idx,
+            ground_plane = obj_panoptic_utils.get_road_plane(img_idx,
                                                     dataset.planes_dir)
 
             image = Image.open(dataset.get_rgb_image_path(sample_name))
@@ -241,8 +245,16 @@ class MiniBatchPreprocessor(object):
             all_anchor_boxes_3d = []
 
             # Create anchors for each class
+            print('mini_batch_panoptic_preprocessor.py : Create anchors for each class')
+            print('mini_batch_panoptic_preprocessor.py : dataset.classes = ', dataset.classes)
             for class_idx in range(len(dataset.classes)):
                 # Generate anchors for all classes
+                print('class_idx = ', class_idx)
+                print('len(dataset.classes) = ', len(dataset.classes))
+                print('self._area_extents = ', self._area_extents)
+                print('all_clusters_sizes = ', all_clusters_sizes)
+                print('self._anchor_strides = ', self._anchor_strides)
+                print('ground_plane = ', ground_plane)
                 grid_anchor_boxes_3d = anchor_generator.generate(
                     area_3d=self._area_extents,
                     anchor_3d_sizes=all_clusters_sizes[class_idx],
@@ -253,7 +265,7 @@ class MiniBatchPreprocessor(object):
 
             # Filter empty anchors
             all_anchor_boxes_3d = np.asarray(all_anchor_boxes_3d)
-            anchors = box_3d_encoder.box_3d_to_anchor(all_anchor_boxes_3d)
+            anchors = box_3d_panoptic_encoder.box_3d_to_anchor(all_anchor_boxes_3d)
             empty_anchor_filter = anchor_filter.get_empty_anchor_filter_2d(
                 anchors, vx_grid_2d, self._density_threshold)
 

@@ -4,10 +4,10 @@ import numpy as np
 
 from wavedata.tools.core.voxel_grid_2d import VoxelGrid2D
 from wavedata.tools.core.voxel_grid import VoxelGrid
-from wavedata.tools.obj_detection import obj_utils
+from wavedata.tools.obj_detection import obj_panoptic_utils
 
 from avod.builders import bev_generator_builder
-from avod.core.label_cluster_utils import LabelClusterUtils
+from avod.core.label_cluster_panoptic_utils import LabelClusterUtils
 from avod.core.mini_batch_panoptic_utils import MiniBatchUtils
 
 
@@ -24,7 +24,7 @@ class PanopticUtils(object):
         self.dataset = dataset
 
         # Label Clusters
-        self.label_cluster_utils = LabelClusterUtils(self.dataset)
+        self.label_cluster_panoptic_utils = LabelClusterUtils(self.dataset)
 
         self.clusters, self.std_devs = [None, None]
 
@@ -56,7 +56,7 @@ class PanopticUtils(object):
 
         # Label Clusters
         self.clusters, self.std_devs = \
-            self.label_cluster_utils.get_clusters()
+            self.label_cluster_panoptic_utils.get_clusters()
 
     def class_str_to_index(self, class_str):
         """
@@ -95,11 +95,11 @@ class PanopticUtils(object):
         """
 
         # Filter points within certain xyz range and offset from ground plane
-        offset_filter = obj_utils.get_point_filter(point_cloud, area_extents,
+        offset_filter = obj_panoptic_utils.get_point_filter(point_cloud, area_extents,
                                                    ground_plane, offset_dist)
 
         # Filter points within 0.2m of the road plane
-        road_filter = obj_utils.get_point_filter(point_cloud, area_extents,
+        road_filter = obj_panoptic_utils.get_point_filter(point_cloud, area_extents,
                                                  ground_plane,
                                                  ground_offset_dist)
 
@@ -152,7 +152,7 @@ class PanopticUtils(object):
             # wavedata wants im_size in (w, h) order
             im_size = [image_shape[1], image_shape[0]]
 
-            point_cloud = obj_utils.get_lidar_point_cloud(
+            point_cloud = obj_panoptic_utils.get_lidar_point_cloud(
                 img_idx, self.dataset.calib_dir, self.dataset.velo_dir,
                 im_size=im_size)
 
@@ -170,7 +170,7 @@ class PanopticUtils(object):
         Returns:
             ground_plane: ground plane coefficients
         """
-        ground_plane = obj_utils.get_road_plane(int(sample_name),
+        ground_plane = obj_panoptic_utils.get_road_plane(int(sample_name),
                                                 self.dataset.planes_dir)
         return ground_plane
 
@@ -190,7 +190,7 @@ class PanopticUtils(object):
         Returns:
             Points filtered with an offset filter in the shape (N, 3)
         """
-        offset_filter = obj_utils.get_point_filter(
+        offset_filter = obj_panoptic_utils.get_point_filter(
             point_cloud, self.area_extents, ground_plane, offset_dist)
 
         # Transpose point cloud into N x 3 points
@@ -240,12 +240,15 @@ class PanopticUtils(object):
             voxel_grid_2d: 3d voxel grid from the given image
         """
         img_idx = int(sample_name)
-        ground_plane = obj_utils.get_road_plane(img_idx,
+        ground_plane = obj_panoptic_utils.get_road_plane(img_idx,
                                                 self.dataset.planes_dir)
 
         point_cloud = self.get_point_cloud(source, img_idx,
                                            image_shape=image_shape)
-        filtered_points = self._apply_slice_filter(point_cloud, ground_plane)
+        # print('point_cloud = ', point_cloud)
+        # Since we have no pointclouds on the floor, we don't need to filter pts.
+        # filtered_points = self._apply_slice_filter(point_cloud, ground_plane)
+        filtered_points = np.asarray(point_cloud).T
 
         # Create Voxel Grid
         voxel_grid_2d = VoxelGrid2D()

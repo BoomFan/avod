@@ -5,8 +5,8 @@ This module converts data to and from the 'box_3d' format
 import numpy as np
 import tensorflow as tf
 
-import avod.core.format_checker as fc
-from wavedata.tools.obj_detection import obj_utils
+import avod.core.format_panoptic_checker as fc
+from wavedata.tools.obj_detection import obj_panoptic_utils
 
 
 def box_3d_to_object_label(box_3d, obj_type='Car'):
@@ -22,7 +22,7 @@ def box_3d_to_object_label(box_3d, obj_type='Car'):
 
     fc.check_box_3d_format(box_3d)
 
-    obj_label = obj_utils.ObjectLabel()
+    obj_label = obj_panoptic_utils.ObjectLabel()
 
     obj_label.type = obj_type
 

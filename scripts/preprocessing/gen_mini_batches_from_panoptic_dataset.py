@@ -90,7 +90,7 @@ def main():
     # Options
     ##############################
     # Serial vs parallel processing
-    in_parallel = True
+    in_parallel = True # Change it back to True  after debugging
 
     process_ped = True  # Pedestrians , default: False
 

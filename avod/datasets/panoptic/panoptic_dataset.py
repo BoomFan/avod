@@ -167,7 +167,7 @@ class PanopticDataset:
         self.calib_dir = self._data_split_dir + '/calib'
         self.disp_dir = self._data_split_dir + '/disparity'
         self.planes_dir = self._data_split_dir + '/planes'
-        self.velo_dir = self._data_split_dir + '/velodyne'
+        self.velo_dir = self._data_split_dir + '/lidar_pointclouds'
         self.depth_dir = self._data_split_dir + '/depth_' + str(self._cam_idx)
 
         # Labels are always in the training folder
@@ -195,8 +195,8 @@ class PanopticDataset:
     def get_depth_map_path(self, sample_name):
         return self.depth_dir + '/' + sample_name + '_left_depth.png'
 
-    def get_velodyne_path(self, sample_name):
-        return self.velo_dir + '/' + sample_name + '.bin'
+    def get_pointcloud_path(self, sample_name):
+        return self.velo_dir + '/' + sample_name + '.ply'
 
     def get_bev_sample_path(self, sample_name):
         return self.bev_image_dir + '/' + sample_name + '.png'

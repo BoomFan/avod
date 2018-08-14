@@ -93,6 +93,10 @@ Alternatively, you can run the `protoc` command directly:
 protoc avod/protos/*.proto --python_out=.
 ```
 
+6. Install pyntcloud for pointcloud reading:
+```sudo pip3 install git+https://github.com/daavoo/pyntcloud```
+(Please make sure you have minimum requirements indicated here: https://github.com/daavoo/pyntcloud/blob/master/docs/installation.rst)
+
 ## Training
 ### Dataset
 To train on the [Kitti Object Detection Dataset](http://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=3d):
